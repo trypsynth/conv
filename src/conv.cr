@@ -1,16 +1,10 @@
 require "option_parser"
 
-enum UnitType
-  Temperature
-  Length
-end
-
-class Unit
+abstract class Unit
   getter symbol : String
-  getter type : UnitType
   alias Converter = Float64 -> Float64
 
-  def initialize(@symbol : String, @type : UnitType, @to_base : Converter, @from_base : Converter)
+  def initialize(@symbol : String, @to_base : Converter, @from_base : Converter)
   end
 
   def to_base(value : Float64) : Float64
@@ -22,31 +16,37 @@ class Unit
   end
 end
 
+class TemperatureUnit < Unit
+end
+
+class LengthUnit < Unit
+end
+
 module UnitConverter
   UNITS = {
     # Temperature, base = Kelvin
-    "k"  => Unit.new("k", UnitType::Temperature, ->(k : Float64) { k }, ->(k : Float64) { k }),
-    "c"  => Unit.new("c", UnitType::Temperature, ->(c : Float64) { c + 273.15 }, ->(k : Float64) { k - 273.15 }),
-    "f"  => Unit.new("f", UnitType::Temperature, ->(f : Float64) { (f - 32.0) * 5.0 / 9.0 + 273.15 }, ->(k : Float64) { (k - 273.15) * 9.0 / 5.0 + 32.0 }),
-    "r"  => Unit.new("r", UnitType::Temperature, ->(r : Float64) { r * 5.0 / 9.0 }, ->(k : Float64) { k * 9.0 / 5.0 }),
-    "de" => Unit.new("de", UnitType::Temperature, ->(de : Float64) { 373.15 - de * 2.0 / 3.0 }, ->(k : Float64) { (373.15 - k) * 3.0 / 2.0 }),
+    "k"  => TemperatureUnit.new("k", ->(k : Float64) { k }, ->(k : Float64) { k }),
+    "c"  => TemperatureUnit.new("c", ->(c : Float64) { c + 273.15 }, ->(k : Float64) { k - 273.15 }),
+    "f"  => TemperatureUnit.new("f", ->(f : Float64) { (f - 32.0) * 5.0 / 9.0 + 273.15 }, ->(k : Float64) { (k - 273.15) * 9.0 / 5.0 + 32.0 }),
+    "r"  => TemperatureUnit.new("r", ->(r : Float64) { r * 5.0 / 9.0 }, ->(k : Float64) { k * 9.0 / 5.0 }),
+    "de" => TemperatureUnit.new("de", ->(de : Float64) { 373.15 - de * 2.0 / 3.0 }, ->(k : Float64) { (373.15 - k) * 3.0 / 2.0 }),
     # Length, base = meter
-    "m"   => Unit.new("m", UnitType::Length, ->(v : Float64) { v }, ->(v : Float64) { v }),
-    "km"  => Unit.new("km", UnitType::Length, ->(v : Float64) { v * 1000 }, ->(v : Float64) { v / 1000 }),
-    "dm"  => Unit.new("dm", UnitType::Length, ->(v : Float64) { v * 0.1 }, ->(v : Float64) { v / 0.1 }),
-    "cm"  => Unit.new("cm", UnitType::Length, ->(v : Float64) { v * 0.01 }, ->(v : Float64) { v / 0.01 }),
-    "mm"  => Unit.new("mm", UnitType::Length, ->(v : Float64) { v * 0.001 }, ->(v : Float64) { v / 0.001 }),
-    "um"  => Unit.new("um", UnitType::Length, ->(v : Float64) { v * 1e-6 }, ->(v : Float64) { v / 1e-6 }),
-    "nm"  => Unit.new("nm", UnitType::Length, ->(v : Float64) { v * 1e-9 }, ->(v : Float64) { v / 1e-9 }),
-    "in"  => Unit.new("in", UnitType::Length, ->(v : Float64) { v * 0.0254 }, ->(v : Float64) { v / 0.0254 }),
-    "ft"  => Unit.new("ft", UnitType::Length, ->(v : Float64) { v * 0.3048 }, ->(v : Float64) { v / 0.3048 }),
-    "yd"  => Unit.new("yd", UnitType::Length, ->(v : Float64) { v * 0.9144 }, ->(v : Float64) { v / 0.9144 }),
-    "mi"  => Unit.new("mi", UnitType::Length, ->(v : Float64) { v * 1609.344 }, ->(v : Float64) { v / 1609.344 }),
-    "nmi" => Unit.new("nmi", UnitType::Length, ->(v : Float64) { v * 1852.0 }, ->(v : Float64) { v / 1852.0 }),
+    "m"   => LengthUnit.new("m", ->(v : Float64) { v }, ->(v : Float64) { v }),
+    "km"  => LengthUnit.new("km", ->(v : Float64) { v * 1000 }, ->(v : Float64) { v / 1000 }),
+    "dm"  => LengthUnit.new("dm", ->(v : Float64) { v * 0.1 }, ->(v : Float64) { v / 0.1 }),
+    "cm"  => LengthUnit.new("cm", ->(v : Float64) { v * 0.01 }, ->(v : Float64) { v / 0.01 }),
+    "mm"  => LengthUnit.new("mm", ->(v : Float64) { v * 0.001 }, ->(v : Float64) { v / 0.001 }),
+    "um"  => LengthUnit.new("um", ->(v : Float64) { v * 1e-6 }, ->(v : Float64) { v / 1e-6 }),
+    "nm"  => LengthUnit.new("nm", ->(v : Float64) { v * 1e-9 }, ->(v : Float64) { v / 1e-9 }),
+    "in"  => LengthUnit.new("in", ->(v : Float64) { v * 0.0254 }, ->(v : Float64) { v / 0.0254 }),
+    "ft"  => LengthUnit.new("ft", ->(v : Float64) { v * 0.3048 }, ->(v : Float64) { v / 0.3048 }),
+    "yd"  => LengthUnit.new("yd", ->(v : Float64) { v * 0.9144 }, ->(v : Float64) { v / 0.9144 }),
+    "mi"  => LengthUnit.new("mi", ->(v : Float64) { v * 1609.344 }, ->(v : Float64) { v / 1609.344 }),
+    "nmi" => LengthUnit.new("nmi", ->(v : Float64) { v * 1852.0 }, ->(v : Float64) { v / 1852.0 }),
   } of String => Unit
 
   def self.convert(value : Float64, from : Unit, to : Unit) : Float64
-    raise "Incompatible units" if from.type != to.type
+    raise "Incompatible units" unless from.class == to.class
     to.from_base(from.to_base(value))
   end
 
@@ -54,16 +54,14 @@ module UnitConverter
     UNITS[unit.downcase]? || (raise "Invalid unit '#{unit}'")
   end
 
-  def self.build_usage : String
+  def self.build_unit_list : String
+    grouped = UNITS.values.group_by(&.class)
     String.build do |sb|
       sb << "Usage: conv <value> <from_unit> <to_unit>\n"
       sb << "Available units:\n"
-      grouped = UNITS.values.group_by(&.type)
-      [UnitType::Temperature, UnitType::Length].each do |type|
-        if units = grouped[type]?
-          symbols = units.map(&.symbol).sort.join(", ")
-          sb << "\t#{type}: #{symbols}\n"
-        end
+      grouped.keys.sort_by(&.name).each do |klass|
+        symbols = grouped[klass].map(&.symbol).sort.join(", ")
+        sb << "  #{klass.name}: #{symbols}\n"
       end
     end
   end
@@ -95,6 +93,7 @@ def run_repl
   end
 end
 
+list_units = false
 repl_mode = false
 show_help = false
 parser = OptionParser.parse do |parser|
@@ -103,12 +102,19 @@ parser = OptionParser.parse do |parser|
 
   Options:
   TEXT
+  parser.on("-l", "--list", "List all available units") do
+    list_units = true
+  end
   parser.on("-i", "--repl", "Start interactive REPL mode") do
     repl_mode = true
   end
   parser.on("-h", "--help", "Show this help and exit") do
     show_help = true
   end
+end
+if list_units
+  puts UnitConverter.build_unit_list
+  exit 0
 end
 if show_help
   puts parser
@@ -119,7 +125,7 @@ if repl_mode
   exit 0
 end
 if ARGV.size != 3
-  STDERR.puts UnitConverter.build_usage
+  STDERR.puts parser
   exit 1
 end
 perform_conversion ARGV
