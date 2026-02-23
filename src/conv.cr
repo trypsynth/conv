@@ -26,6 +26,8 @@ module UnitConverter
     "k"  => Unit.new("k", UnitType::Temperature, ->(k : Float64) { k }, ->(k : Float64) { k }),
     "c"  => Unit.new("c", UnitType::Temperature, ->(c : Float64) { c + 273.15 }, ->(k : Float64) { k - 273.15 }),
     "f"  => Unit.new("f", UnitType::Temperature, ->(f : Float64) { (f - 32.0) * 5.0 / 9.0 + 273.15 }, ->(k : Float64) { (k - 273.15) * 9.0 / 5.0 + 32.0 }),
+    "r" => Unit.new("r", UnitType::Temperature, ->(r : Float64) { r * 5.0 / 9.0 }, ->(k : Float64) { k * 9.0 / 5.0 }),
+    "de" => Unit.new("de", UnitType::Temperature, ->(de : Float64) { 373.15 - de * 2.0 / 3.0 }, ->(k : Float64) { (373.15 - k) * 3.0 / 2.0 }),
     # Length, base = meter
     "m"  => Unit.new("m", UnitType::Length, ->(v : Float64) { v }, ->(v : Float64) { v }),
     "km" => Unit.new("km", UnitType::Length, ->(v : Float64) { v * 1000 }, ->(v : Float64) { v / 1000 }),
@@ -38,6 +40,7 @@ module UnitConverter
     "ft" => Unit.new("ft", UnitType::Length, ->(v : Float64) { v * 0.3048 }, ->(v : Float64) { v / 0.3048 }),
     "yd" => Unit.new("yd", UnitType::Length, ->(v : Float64) { v * 0.9144 }, ->(v : Float64) { v / 0.9144 }),
     "mi" => Unit.new("mi", UnitType::Length, ->(v : Float64) { v * 1609.344 }, ->(v : Float64) { v / 1609.344 }),
+    "nmi" => Unit.new("nmi", UnitType::Length, ->(v : Float64) { v * 1852.0 }, ->(v : Float64) { v / 1852.0 }),
   } of String => Unit
 
   def self.convert(value : Float64, from : Unit, to : Unit) : Float64
