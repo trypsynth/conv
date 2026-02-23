@@ -83,7 +83,7 @@ def perform_conversion(args : Array(String))
   from = Units.find(args[1])
   to = Units.find(args[2])
   result = from.convert(value, to)
-  puts "#{value} #{from.symbol} is #{result} #{to.symbol}"
+  puts "#{value} #{from.symbol} is #{sprintf("%.4f", result)} #{to.symbol}"
 rescue ex : Exception
   STDERR.puts "Error: #{ex.message}"
 end
