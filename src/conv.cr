@@ -67,23 +67,19 @@ module UnitConverter
   end
 end
 
-def main
-  if ARGV.size != 3
-    STDERR.puts UnitConverter.build_usage
-    exit 1
-  end
-  begin
-    input_value = ARGV[0].to_f
-    from = UnitConverter.validate_unit(ARGV[1])
-    to = UnitConverter.validate_unit(ARGV[2])
-    result = UnitConverter.convert(input_value, from, to)
-    puts "#{input_value} #{from.symbol} is #{result} #{to.symbol}"
-  rescue e
-    STDERR.puts "conv: error: #{e.message}"
-    STDERR.puts
-    STDERR.puts UnitConverter.build_usage
-    exit 1
-  end
+if ARGV.size != 3
+  STDERR.puts UnitConverter.build_usage
+  exit 1
 end
-
-main
+begin
+  input_value = ARGV[0].to_f
+  from = UnitConverter.validate_unit(ARGV[1])
+  to = UnitConverter.validate_unit(ARGV[2])
+  result = UnitConverter.convert(input_value, from, to)
+  puts "#{input_value} #{from.symbol} is #{result} #{to.symbol}"
+rescue e
+  STDERR.puts "conv: error: #{e.message}"
+  STDERR.puts
+  STDERR.puts UnitConverter.build_usage
+  exit 1
+end
