@@ -98,11 +98,15 @@ end
 repl_mode = false
 show_help = false
 parser = OptionParser.parse do |parser|
-  parser.banner = "Usage: conv [options] <value> <from_unit> <to_unit>"
+  parser.banner = <<-TEXT
+  Usage: conv [options] <value> <from_unit> <to_unit>
+
+  Options:
+  TEXT
   parser.on("-i", "--repl", "Start interactive REPL mode") do
     repl_mode = true
   end
-  parser.on("-h", "--help", "Show this help") do
+  parser.on("-h", "--help", "Show this help and exit") do
     show_help = true
   end
 end
