@@ -1,3 +1,5 @@
+require "option_parser"
+
 enum UnitType
   Temperature
   Length
@@ -67,19 +69,53 @@ module UnitConverter
   end
 end
 
+def perform_conversion(parts : Array(String))
+  value = parts[0].to_f
+  from = UnitConverter.validate_unit(parts[1])
+  to = UnitConverter.validate_unit(parts[2])
+  result = UnitConverter.convert(value, from, to)
+  puts "#{value} #{from.symbol} is #{result} #{to.symbol}"
+rescue e
+  puts "Error: #{e.message}"
+end
+
+def run_repl
+  puts "Conv REPL ready."
+  loop do
+    print "> "
+    line = gets
+    break unless line
+    line = line.strip
+    parts = line.split
+    if parts.size != 3
+      puts "Invalid input. Expected: <value> <from> <to>"
+      next
+    end
+    perform_conversion parts
+  end
+end
+
+repl_mode = false
+show_help = false
+parser = OptionParser.parse do |parser|
+  parser.banner = "Usage: conv [options] <value> <from_unit> <to_unit>"
+  parser.on("-i", "--repl", "Start interactive REPL mode") do
+    repl_mode = true
+  end
+  parser.on("-h", "--help", "Show this help") do
+    show_help = true
+  end
+end
+if show_help
+  puts parser
+  exit 0
+end
+if repl_mode
+  run_repl
+  exit 0
+end
 if ARGV.size != 3
   STDERR.puts UnitConverter.build_usage
   exit 1
 end
-begin
-  input_value = ARGV[0].to_f
-  from = UnitConverter.validate_unit(ARGV[1])
-  to = UnitConverter.validate_unit(ARGV[2])
-  result = UnitConverter.convert(input_value, from, to)
-  puts "#{input_value} #{from.symbol} is #{result} #{to.symbol}"
-rescue e
-  STDERR.puts "conv: error: #{e.message}"
-  STDERR.puts
-  STDERR.puts UnitConverter.build_usage
-  exit 1
-end
+perform_conversion ARGV
