@@ -98,7 +98,7 @@ module Units
     "kib" => data("kib", 1024.0),
     "mib" => data("mib", 1048576.0),
     "gib" => data("gib", 1073741824.0),
-    "tib" => data("tib", 199511627776.0),
+    "tib" => data("tib", 1099511627776.0),
     "pib" => data("pib", 1125899906842624.0),
     "bit" => data("bit", 0.125),
     # Time (base = second)
@@ -133,7 +133,8 @@ def perform_conversion(args : Array(String))
   from = Units.find(args[1])
   to = Units.find(args[2])
   result = from.convert(value, to: to)
-  puts "#{value} #{from.symbol} is #{"%.4f" % result} #{to.symbol}"
+  formatted = result.round(4).to_s.sub(/\.?0+$/, "")
+  puts "#{value} #{from.symbol} is #{formatted} #{to.symbol}"
 rescue ex
   abort "Error: #{ex.message}"
 end
