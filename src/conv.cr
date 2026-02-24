@@ -7,6 +7,10 @@ class InvalidUnitError < Exception; end
 enum UnitKind
   Temperature
   Length
+  Weight
+  Volume
+  Data
+  Time
 end
 
 record Unit, symbol : String, kind : UnitKind, to_base : (Float64 -> Float64), from_base : (Float64 -> Float64) do
@@ -23,6 +27,22 @@ module Units
 
   private def self.length(symbol, factor)
     Unit.new(symbol, :length, ->(v : Float64) { v * factor }, ->(v : Float64) { v / factor })
+  end
+
+  private def self.weight(symbol, factor)
+    Unit.new(symbol, :weight, ->(v : Float64) { v * factor }, ->(v : Float64) { v / factor })
+  end
+
+  private def self.volume(symbol, factor)
+    Unit.new(symbol, :volume, ->(v : Float64) { v * factor }, ->(v : Float64) { v / factor })
+  end
+
+  private def self.data(symbol, factor)
+    Unit.new(symbol, :data, ->(v : Float64) { v * factor }, ->(v : Float64) { v / factor })
+  end
+
+  private def self.time(symbol, factor)
+    Unit.new(symbol, :time, ->(v : Float64) { v * factor }, ->(v : Float64) { v / factor })
   end
 
   IDENTITY = ->(v : Float64) { v }
@@ -47,6 +67,50 @@ module Units
     "yd"  => length("yd", 0.9144),
     "mi"  => length("mi", 1609.344),
     "nmi" => length("nmi", 1852.0),
+    # Weight (base = gram)
+    "g"  => weight("g", 1.0),
+    "kg" => weight("kg", 1000.0),
+    "mg" => weight("mg", 0.001),
+    "ug" => weight("ug", 1e-6),
+    "lb" => weight("lb", 453.592),
+    "oz" => weight("oz", 28.3495),
+    "st" => weight("st", 6350.29),
+    "t"  => weight("t", 1000000.0),
+    # Volume (base = liter)
+    "l"    => volume("l", 1.0),
+    "ml"   => volume("ml", 0.001),
+    "cl"   => volume("cl", 0.01),
+    "dl"   => volume("dl", 0.1),
+    "gal"  => volume("gal", 3.78541),
+    "qt"   => volume("qt", 0.946353),
+    "pt"   => volume("pt", 0.473176),
+    "cup"  => volume("cup", 0.236588),
+    "floz" => volume("floz", 0.0295735),
+    "tbsp" => volume("tbsp", 0.0147868),
+    "tsp"  => volume("tsp", 0.00492892),
+    # Data (base = byte)
+    "b"   => data("b", 1.0),
+    "kb"  => data("kb", 1000.0),
+    "mb"  => data("mb", 1000000.0),
+    "gb"  => data("gb", 1000000000.0),
+    "tb"  => data("tb", 1000000000000.0),
+    "pb"  => data("pb", 1e15),
+    "kib" => data("kib", 1024.0),
+    "mib" => data("mib", 1048576.0),
+    "gib" => data("gib", 1073741824.0),
+    "tib" => data("tib", 199511627776.0),
+    "pib" => data("pib", 1125899906842624.0),
+    "bit" => data("bit", 0.125),
+    # Time (base = second)
+    "s"   => time("s", 1.0),
+    "ms"  => time("ms", 0.001),
+    "us"  => time("us", 1e-6),
+    "ns"  => time("ns", 1e-9),
+    "min" => time("min", 60.0),
+    "hr"  => time("hr", 3600.0),
+    "day" => time("day", 86400.0),
+    "wk"  => time("wk", 604800.0),
+    "yr"  => time("yr", 31557600.0),
   }
 
   def self.find(name : String) : Unit
@@ -90,11 +154,11 @@ end
 
 list_units = false
 repl_mode = false
-parser = OptionParser.parse do |p|
-  p.banner = "Usage: conv [options] <value> <from_unit> <to_unit>\n\nOptions:"
-  p.on("-l", "--list", "List all available units") { list_units = true }
-  p.on("-i", "--repl", "Start interactive REPL mode") { repl_mode = true }
-  p.on("-h", "--help", "Show this help and exit") { puts p; exit }
+parser = OptionParser.parse do |par|
+  par.banner = "Usage: conv [options] <value> <from_unit> <to_unit>\n\nOptions:"
+  par.on("-l", "--list", "List all available units") { list_units = true }
+  par.on("-i", "--repl", "Start interactive REPL mode") { repl_mode = true }
+  par.on("-h", "--help", "Show this help and exit") { puts par; exit }
 end
 case
 when list_units     then puts Units.list
