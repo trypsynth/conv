@@ -136,7 +136,7 @@ def perform_conversion(args : Array(String))
   formatted = result.round(4).to_s.sub(/\.?0+$/, "")
   puts "#{value} #{from.symbol} is #{formatted} #{to.symbol}"
 rescue ex
-  abort "Error: #{ex.message}"
+  STDERR.puts "Error: #{ex.message}"
 end
 
 def run_repl
@@ -146,7 +146,7 @@ def run_repl
     line = gets || break
     parts = line.strip.split
     unless parts.size == 3
-      puts "Expected: <value> <from> <to>"
+      STDERR.puts "Error: invalid syntax. Expected <value> <from> <to>."
       next
     end
     perform_conversion(parts)
@@ -164,6 +164,6 @@ end
 case
 when list_units     then puts Units.list
 when repl_mode      then run_repl
-when ARGV.size == 3 then perform_conversion(ARGV)
+when ARGV.size == 3 then perform_conversion(ARGV); exit 0
 else                     abort parser
 end
