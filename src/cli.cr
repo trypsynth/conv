@@ -14,7 +14,7 @@ parser = OptionParser.parse do |par|
   end
 end
 case
-when list_units then puts Units.list
+when list_units     then puts Units.list
 when repl_mode      then run_repl
 when ARGV.size == 3 then perform_conversion(ARGV)
 else                     abort parser
