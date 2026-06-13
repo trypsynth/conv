@@ -7,6 +7,11 @@ parser = OptionParser.parse do |par|
   par.on("-l", "--list", "List all available units") { list_units = true }
   par.on("-i", "--repl", "Start interactive REPL mode") { repl_mode = true }
   par.on("-h", "--help", "Show this help and exit") { puts par; exit }
+  par.invalid_option do |flag|
+    STDERR.puts "Unknown option: #{flag}"
+    STDERR.puts par
+    exit 1
+  end
 end
 case
 when list_units then puts Units.list
