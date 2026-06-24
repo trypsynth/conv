@@ -17,5 +17,6 @@ case
 when list_units     then puts Units.list
 when repl_mode      then run_repl
 when ARGV.size == 3 then perform_conversion(ARGV)
+when ARGV.empty?    then run_repl
 else                     abort parser
 end

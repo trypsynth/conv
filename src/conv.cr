@@ -140,7 +140,7 @@ rescue ex
 end
 
 def run_repl
-  puts "Conv REPL ready."
+  puts "Conv REPL - type <value> <from> <to> to convert, or quit/exit/q to exit."
   loop do
     print "> "
     line = gets || break
