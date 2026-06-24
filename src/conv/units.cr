@@ -1,0 +1,111 @@
+require "./unit"
+
+module Conv
+  module Units
+    private def self.temp(symbol, to_base, from_base)
+      Unit.new(symbol, :temperature, to_base, from_base)
+    end
+
+    private def self.length(symbol, factor)
+      Unit.new(symbol, :length, ->(v : Float64) { v * factor }, ->(v : Float64) { v / factor })
+    end
+
+    private def self.weight(symbol, factor)
+      Unit.new(symbol, :weight, ->(v : Float64) { v * factor }, ->(v : Float64) { v / factor })
+    end
+
+    private def self.volume(symbol, factor)
+      Unit.new(symbol, :volume, ->(v : Float64) { v * factor }, ->(v : Float64) { v / factor })
+    end
+
+    private def self.data(symbol, factor)
+      Unit.new(symbol, :data, ->(v : Float64) { v * factor }, ->(v : Float64) { v / factor })
+    end
+
+    private def self.time(symbol, factor)
+      Unit.new(symbol, :time, ->(v : Float64) { v * factor }, ->(v : Float64) { v / factor })
+    end
+
+    IDENTITY = ->(v : Float64) { v }
+
+    ALL = {
+      # Temperature (base = Kelvin)
+      "k"  => temp("K", IDENTITY, IDENTITY),
+      "c"  => temp("C", ->(v : Float64) { v + 273.15 }, ->(v : Float64) { v - 273.15 }),
+      "f"  => temp("F", ->(v : Float64) { (v - 32) * 5 / 9 + 273.15 }, ->(v : Float64) { (v - 273.15) * 9 / 5 + 32 }),
+      "r"  => temp("R", ->(v : Float64) { v * 5 / 9 }, ->(v : Float64) { v * 9 / 5 }),
+      "de" => temp("De", ->(v : Float64) { 373.15 - v * 2 / 3 }, ->(v : Float64) { (373.15 - v) * 3 / 2 }),
+      # Length (base = meter)
+      "m"   => length("m", 1.0),
+      "km"  => length("km", 1000.0),
+      "dm"  => length("dm", 0.1),
+      "cm"  => length("cm", 0.01),
+      "mm"  => length("mm", 0.001),
+      "um"  => length("μm", 1e-6),
+      "nm"  => length("nm", 1e-9),
+      "in"  => length("in", 0.0254),
+      "ft"  => length("ft", 0.3048),
+      "yd"  => length("yd", 0.9144),
+      "mi"  => length("mi", 1609.344),
+      "nmi" => length("nmi", 1852.0),
+      # Weight (base = gram)
+      "g"  => weight("g", 1.0),
+      "kg" => weight("kg", 1000.0),
+      "mg" => weight("mg", 0.001),
+      "ug" => weight("μg", 1e-6),
+      "lb" => weight("lb", 453.592),
+      "oz" => weight("oz", 28.3495),
+      "st" => weight("st", 6350.29),
+      "t"  => weight("t", 1000000.0),
+      # Volume (base = liter)
+      "l"    => volume("L", 1.0),
+      "ml"   => volume("mL", 0.001),
+      "cl"   => volume("cL", 0.01),
+      "dl"   => volume("dL", 0.1),
+      "gal"  => volume("gal", 3.78541),
+      "qt"   => volume("qt", 0.946353),
+      "pt"   => volume("pt", 0.473176),
+      "cup"  => volume("cup", 0.236588),
+      "floz" => volume("fl oz", 0.0295735),
+      "tbsp" => volume("tbsp", 0.0147868),
+      "tsp"  => volume("tsp", 0.00492892),
+      # Data (base = byte)
+      "b"   => data("B", 1.0),
+      "kb"  => data("KB", 1000.0),
+      "mb"  => data("MB", 1000000.0),
+      "gb"  => data("GB", 1000000000.0),
+      "tb"  => data("TB", 1000000000000.0),
+      "pb"  => data("PB", 1e15),
+      "kib" => data("KiB", 1024.0),
+      "mib" => data("MiB", 1048576.0),
+      "gib" => data("GiB", 1073741824.0),
+      "tib" => data("TiB", 1099511627776.0),
+      "pib" => data("PiB", 1125899906842624.0),
+      "bit" => data("bit", 0.125),
+      # Time (base = second)
+      "s"   => time("s", 1.0),
+      "ms"  => time("ms", 0.001),
+      "us"  => time("μs", 1e-6),
+      "ns"  => time("ns", 1e-9),
+      "min" => time("min", 60.0),
+      "hr"  => time("hr", 3600.0),
+      "day" => time("day", 86400.0),
+      "wk"  => time("wk", 604800.0),
+      "yr"  => time("yr", 31557600.0),
+    }
+
+    def self.find(name : String) : Unit
+      ALL[name.downcase]? || raise InvalidUnitError.new("Invalid unit '#{name}'")
+    end
+
+    def self.list
+      String.build do |io|
+        io << "Available units:\n"
+        ALL.values.group_by(&.kind).each do |kind, units|
+          symbols = units.map(&.symbol).sort!.join(", ")
+          io << "  #{kind}: #{symbols}\n"
+        end
+      end
+    end
+  end
+end
