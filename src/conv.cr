@@ -146,6 +146,7 @@ def run_repl
     line = gets || break
     parts = line.strip.split
     next if parts.empty?
+    break if parts[0].in?("quit", "exit", "q")
     unless parts.size == 3
       STDERR.puts "Error: invalid syntax. Expected <value> <from> <to>."
       next
