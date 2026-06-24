@@ -145,6 +145,7 @@ def run_repl
     print "> "
     line = gets || break
     parts = line.strip.split
+    next if parts.empty?
     unless parts.size == 3
       STDERR.puts "Error: invalid syntax. Expected <value> <from> <to>."
       next
